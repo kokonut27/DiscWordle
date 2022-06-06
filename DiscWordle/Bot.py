@@ -32,7 +32,7 @@ async def on_message(Msg):
   if Msg.author == client.user:
     return
   msg = Msg.content
-  
+
   if msg.startswith(f"{PREFIX}help"):
     builder = discord.Embed(title = "Discwordle commands", name = "Help", description = f"""`{PREFIX}help`: Helps with bot commands.
 `{PREFIX}dgame`: Play the daily Wordle game.""")
@@ -44,7 +44,7 @@ async def on_message(Msg):
     cooldown.get_ratelimit(Msg)
     print(await cooldown.check(Msg))
     game_choice = random.randint(1, 2)
-    if game_choice == 1 or game_choice == 2: # Change this when there are more games
+    if game_choice in [1, 2]: # Change this when there are more games
       game = EmojiGame(msg,   client)
       await game.run_game()
       isCorrectEmoji = game.get_info()
