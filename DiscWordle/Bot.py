@@ -22,6 +22,8 @@ def checkIfUserExists(author):
 for all in db.keys():
   print(all)
 
+# db.clear()
+
 bot = commands.Bot(command_prefix = PREFIX, activity=activity, intents=intents)
 
 
@@ -33,13 +35,18 @@ async def on_ready():
 
 @client.event
 async def on_message(Msg):
+  msg = Msg.content
   if Msg.author == client.user:
     return
-  msg = Msg.content
+  elif str(Msg.author.id) not in db.keys():
+    if msg.startswith(f"{PREFIX}"):
+      builder = discord.Embed(title = "Welcome!", name = "Welcome", color=0x6aaa64, description = f"Hey {Msg.author.mention}, seems like you're a new user to DiscWordle! Glad to have you with us, and if you need any help, just type `dw!help`. \n\nEnjoy!")
+      await Msg.channel.send(embed = builder)
+      checkIfUserExists(Msg.author.id) # Creates user
 
   if msg.startswith(f"{PREFIX}help"):
-    builder = discord.Embed(title = "DiscWordle commands", name = "Help", description = f"""`{PREFIX}help`: Helps with bot commands.
-`{PREFIX}dgame`: Play the daily Wordle game.""")
+    builder = discord.Embed(title = "DiscWordle commands", name = "Help", color=0x6aaa64, description = f"""`{PREFIX}help`: Helps with bot commands.
+`{PREFIX}dgame`: Play the official daily Wordle game.""")
     await Msg.channel.send(embed = builder)
 
   if msg.startswith(f"{PREFIX}dgame"):
