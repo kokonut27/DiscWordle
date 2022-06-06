@@ -9,6 +9,7 @@ from utils.Cooldown import Cooldown
 intents = discord.Intents.default()
 client = discord.Client(intents=intents)
 PREFIX = "dw!"
+activity = discord.Game(name = "dw!help")
 
 def checkIfUserExists(author):
   try:
@@ -18,13 +19,16 @@ def checkIfUserExists(author):
       "coins": 10,
     }
 
-bot = commands.Bot(command_prefix = PREFIX, intents=intents)
+for all in db.keys():
+  print(all)
+
+bot = commands.Bot(command_prefix = PREFIX, activity=activity, intents=intents)
 
 
 @client.event
 async def on_ready():
+  await client.change_presence(activity=activity)
   print(f"Bot logged in as {client.user}")
-  await bot.change_presence(activity=discord.Game(name="dw!help"))
 
 
 @client.event
@@ -34,28 +38,15 @@ async def on_message(Msg):
   msg = Msg.content
 
   if msg.startswith(f"{PREFIX}help"):
-    builder = discord.Embed(title = "Discwordle commands", name = "Help", description = f"""`{PREFIX}help`: Helps with bot commands.
+    builder = discord.Embed(title = "DiscWordle commands", name = "Help", description = f"""`{PREFIX}help`: Helps with bot commands.
 `{PREFIX}dgame`: Play the daily Wordle game.""")
     await Msg.channel.send(embed = builder)
 
-  if msg.startswith(f"{PREFIX}game"):
-    checkIfUserExists(msg.author.id)
+  if msg.startswith(f"{PREFIX}dgame"):
+    checkIfUserExists(Msg.author.id)
     cooldown = Cooldown()
     cooldown.get_ratelimit(Msg)
     print(await cooldown.check(Msg))
-    game_choice = random.randint(1, 2)
-    if game_choice in [1, 2]: # Change this when there are more games
-      game = EmojiGame(msg,   client)
-      await game.run_game()
-      isCorrectEmoji = game.get_info()
-      if game.is_done():
-        await game.emj_msg.clear_reactions()
-        if isCorrectEmoji:
-          await game.emj_msg.edit(content = f"{msg.author.mention}, you had the correct emoji! You got 1000 Mora!")
-          db[str(msg.author.id)]["mora"] += 1000
-        else:
-          await game.emj_msg.edit(content = f"{msg.author.mention}, you had the wrong emoji!")
-        game.reset() # Resets all of the variables for cleanup and easy memory destruction
+    await Msg.channel.send(content = "hi :D")
     
-
 client.run(os.environ["TOKEN"])
