@@ -7,7 +7,7 @@ with open('DiscWordle/utils/database/schema.sql') as f:
 
 cur = connection.cursor()
 
-cur.execute("INSERT INTO wordles (word, topic) VALUES (?, ?)", ("disco", "music"))
+cur.execute("INSERT INTO wordles (creator, word, topic) VALUES (?, ?, ?)", (921548675119992852, "disco", "music"))
 
 connection.commit()
 connection.close()

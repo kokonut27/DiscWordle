@@ -68,9 +68,11 @@ async def on_message(Msg):
 
   if msg.startswith(f"{PREFIX}help"):
     builder = discord.Embed(title = "DiscWordle commands", name = "Help", color=0x6aaa64, description = f"""`{PREFIX}help`: Helps with bot commands.
-`{PREFIX}dgame`: Play the official daily Wordle game.
-`{PREFIX}game`: Play a custom Wordle game.
-`{PREFIX}multigame`: Play a multiplayer Wordle game with your friends!""")
+`{PREFIX}dgame`: Play the official daily Wordle.
+`{PREFIX}game [id]`: Play a random community Wordle. Optional: [id] chooses a specific community Wordle to play.
+\t`{PREFIX}guess [letter]`: Guess a letter in any Wordle. Only works once you have started.
+`{PREFIX}multigame`: Play a multiplayer Wordle with your friends!
+`{PREFIX}allgames`: Look at all Wordles available that are made by the community!""")
     await Msg.channel.send(embed = builder)
 
   if msg.startswith(f"{PREFIX}dgame"):
@@ -86,7 +88,25 @@ async def on_message(Msg):
     cooldown.get_ratelimit(Msg)
     print(await cooldown.check(Msg))
 
-    # 
+    wordle = getWordle()
+    topic = wordle["topic"]
+    id = wordle["id"]
+    word = wordle["word"]
+    creator = wordle["creator"]
+    nonexist = "⬛"
+    correct = "🟩"
+    incorrect = "🟨"
+    empty = "⬜"
+    guesses = 5
+    
+    builder = discord.Embed(title = f"Wordle #{str(id)}", name = "Community Wordle", color=0x6aaa64, description = f"""> **Created by: <@{creator}> | Topic: {topic}**
+
+{empty*5}
+{empty*5}
+{empty*5}
+{empty*5}
+{empty*5}""")
+    await Msg.channel.send(embed = builder)
     
 try:
   client.run(os.environ["TOKEN"])
