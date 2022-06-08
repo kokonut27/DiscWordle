@@ -4,9 +4,11 @@ from discord.ext import commands
 
 
 class Cooldown:
+    """
+    Bot command cooldown
+    """
     def __init__(self):
-        self._cd = commands.CooldownMapping.from_cooldown(
-            1 * 1000, 6, commands.BucketType.member)
+        self._cd = commands.CooldownMapping.from_cooldown(1 * 1000, 6, commands.BucketType.member)
 
     def get_ratelimit(self, message: discord.Message) -> typing.Optional[int]:
         """Returns the ratelimit left"""

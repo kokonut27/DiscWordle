@@ -1,4 +1,4 @@
 .replit
 __pycache__/
 venv/
-/
+database.db
