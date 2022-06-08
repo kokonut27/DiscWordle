@@ -59,7 +59,7 @@ async def on_message(Msg):
   msg = Msg.content
   if Msg.author == client.user:
     return
-  elif str(Msg.author.id) not in db.keys():
+  if str(Msg.author.id) not in db.keys():
     if msg in allCommands:
       builder = discord.Embed(title = "Welcome!", name = "Welcome", color=0x6aaa64, description = f"Hey {Msg.author.mention}, seems like you're a new user to DiscWordle! Glad to have you with us, and if you need any help, just type `dw!help`. \n\nEnjoy!")
       # await Msg.channel.send(embed = builder)
@@ -70,7 +70,7 @@ async def on_message(Msg):
     builder = discord.Embed(title = "DiscWordle commands", name = "Help", color=0x6aaa64, description = f"""`{PREFIX}help`: Helps with bot commands.
 `{PREFIX}dgame`: Play the official daily Wordle.
 `{PREFIX}game [id]`: Play a random community Wordle. Optional: [id] chooses a specific community Wordle to play.
-\t`{PREFIX}guess [letter]`: Guess a letter in any Wordle. Only works once you have started.
+`{PREFIX}guess [letter] [id]`: Guess a letter in any Wordle. Only works once you have started. [id]: Enter the Wordle id you're guessing for.
 `{PREFIX}multigame`: Play a multiplayer Wordle with your friends!
 `{PREFIX}allgames`: Look at all Wordles available that are made by the community!""")
     await Msg.channel.send(embed = builder)
