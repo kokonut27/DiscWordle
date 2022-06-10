@@ -27,6 +27,7 @@ intents = discord.Intents.default()
 client = discord.Client(intents=intents)
 PREFIX = "dw!"
 activity = discord.Game(name = "dw!help")
+topics = ["gaming", "fun", "music", "general", "math", "science", "english", "history", "school"]
 
 def checkIfUserExists(author):
   try:
@@ -70,9 +71,10 @@ async def on_message(Msg):
     builder = discord.Embed(title = "DiscWordle commands", name = "Help", color=0x6aaa64, description = f"""`{PREFIX}help`: Helps with bot commands.
 `{PREFIX}dgame`: Play the official daily Wordle.
 `{PREFIX}game [id]`: Play a random community Wordle. Optional: [id] chooses a specific community Wordle to play.
-`{PREFIX}guess [letter] [id]`: Guess a letter in any Wordle. Only works once you have started. [id]: Enter the Wordle id you're guessing for.
+`{PREFIX}guess [word] [id]`: Guess a word in any Wordle. Only works once you have started. [id]: Enter the Wordle id you're guessing for.
 `{PREFIX}multigame`: Play a multiplayer Wordle with your friends!
-`{PREFIX}allgames`: Look at all Wordles available that are made by the community!""")
+`{PREFIX}allgames`: Look at all Wordles available that are made by the community!
+`{PREFIX}create [word] [topic]`: Create a Wordle and post it to the community.""")
     await Msg.channel.send(embed = builder)
 
   if msg.startswith(f"{PREFIX}dgame"):
@@ -81,6 +83,56 @@ async def on_message(Msg):
     cooldown.get_ratelimit(Msg)
     print(await cooldown.check(Msg))
     await Msg.channel.send(content = "hi :D")
+
+  if msg.startswith(f"{PREFIX}guess"):
+    checkIfUserExists(Msg.author.id)
+    cooldown = Cooldown()
+    cooldown.get_ratelimit(Msg)
+    print(await cooldown.check(Msg))
+
+    message = msg.split()
+    letterGuess = message[1]
+    wordleId = message[2]
+
+  if msg.startswith(f"{PREFIX}create"):
+    checkIfUserExists(Msg.author.id)
+    cooldown = Cooldown()
+    cooldown.get_ratelimit(Msg)
+    print(await cooldown.check(Msg))
+
+    message = msg.split()
+    word = message[1]
+    topic = message[2]
+
+    if len(word) == 5:
+      if word in getWord():
+        if topic.lower() in topics:
+          conn = get_db_connection()
+          conn.execute("INSERT INTO wordles (creator, word, topic) VALUES (?, ?, ?)", (Msg.author.id, word, topic))
+          conn.commit()
+          conn.close()
+          
+          id = getWordle()["id"]
+          empty = "⬜"
+
+          builder = discord.Embed(title = f"Wordle created! | Wordle #{str(id)}", name = "Wordle created", color=0x6aaa64, description = f"""> **Created by: <@{Msg.author.id}> | Topic: {topic}**
+
+{empty*5}
+{empty*5}
+{empty*5}
+{empty*5}
+{empty*5}
+{empty*5}""")
+          await Msg.channel.send(embed = builder)
+        else:
+          builder = discord.Embed(title = "Topic doesn't exist!", name = "No topic", color=0x6aaa64, description = f"`{topic}` does not exist!")
+          await Msg.channel.send(embed = builder)
+      else:
+        builder = discord.Embed(title = "Word doesn't exist!", name = "No word", color=0x6aaa64, description = f"`{word}` is not a word that is in the dictionary!")
+        await Msg.channel.send(embed = builder)
+    else:
+      builder = discord.Embed(title = "Word isn't 5 letters!", name = "Not five letters", color=0x6aaa64, description = f"`{word}` is not a 5 letter word!")
+      await Msg.channel.send(embed = builder)
 
   if msg.startswith(f"{PREFIX}game"):
     checkIfUserExists(Msg.author.id)
@@ -105,12 +157,13 @@ async def on_message(Msg):
 {empty*5}
 {empty*5}
 {empty*5}
+{empty*5}
 {empty*5}""")
     await Msg.channel.send(embed = builder)
     
 try:
   client.run(os.environ["TOKEN"])
 except discord.errors.HTTPException:
-  print("\n\n\nBLOCKED BY RATE LIMITS\nRESTARTING NOW\n\n\n")
+  print("Resetting due to rate limits.")
   os.system("python DiscWordle/utils/restart.py")
   os.system('kill 1')
