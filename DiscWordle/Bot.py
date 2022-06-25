@@ -3,9 +3,11 @@ from discord.ext import commands
 import os
 import random
 import sqlite3
+import json
 from replit import db
 from utils.Cooldown import Cooldown
 from utils.Words import getWord
+from utils.api import api
 
 
 def get_db_connection():
@@ -13,15 +15,27 @@ def get_db_connection():
   conn.row_factory = sqlite3.Row
   return conn
 
-def getWordle():
+def getRandomWordle():
   conn = get_db_connection()
   max = conn.execute('SELECT *, max(id) FROM wordles').fetchone()["id"]
   min = conn.execute('SELECT *, min(id) FROM wordles').fetchone()["id"]
   _id = random.randint(min, max)
-  wordle = conn.execute('SELECT * FROM wordles WHERE id = ?', (_id, )).fetchone() 
+  wordle = conn.execute('SELECT * FROM wordles WHERE id = ?', (_id, )).fetchone()
   conn.close()
   
   return wordle
+
+def getWordle(word):  
+  conn = get_db_connection()
+  allWordles = conn.execute('SELECT * FROM wordles').fetchall()
+  conn.commit()
+  conn.close()
+  id = ""
+  for x in allWordles:
+    if x["word"] == word:
+      id+=x["id"]
+  
+  return id
 
 intents = discord.Intents.default()
 client = discord.Client(intents=intents)
@@ -48,6 +62,7 @@ allCommands = [
   "dw!dgame",
   "dw!game"
 ]
+
 
 @client.event
 async def on_ready():
@@ -82,7 +97,19 @@ async def on_message(Msg):
     cooldown = Cooldown()
     cooldown.get_ratelimit(Msg)
     print(await cooldown.check(Msg))
-    await Msg.channel.send(content = "hi :D")
+
+    id = "∞"
+    empty = "⬜"
+  
+    builder = discord.Embed(title = f"Wordle #{str(id)}", name = "Official Wordle", color=0x6aaa64, description = f"""> **Created by: Wordle | Topic: Wordle :)**
+  
+{empty*5}
+{empty*5}
+{empty*5}
+{empty*5}
+{empty*5}
+{empty*5}""")
+    await Msg.channel.send(embed = builder)
 
   if msg.startswith(f"{PREFIX}guess"):
     checkIfUserExists(Msg.author.id)
@@ -94,6 +121,8 @@ async def on_message(Msg):
     letterGuess = message[1]
     wordleId = message[2]
 
+    
+
   if msg.startswith(f"{PREFIX}create"):
     checkIfUserExists(Msg.author.id)
     cooldown = Cooldown()
@@ -101,38 +130,45 @@ async def on_message(Msg):
     print(await cooldown.check(Msg))
 
     message = msg.split()
-    word = message[1]
-    topic = message[2]
+    try:
+      word = message[1]
+      topic = message[2]
+      wordExists = True
+    except:
+      wordExists = False
+      builder = discord.Embed(title = "Attributes missing!", name = "No topic", color=0x6aaa64, description = f"[word] and [topic] attributes are missing!")
+      await Msg.reply(embed = builder, mention_author = True)
 
-    if len(word) == 5:
-      if word in getWord():
-        if topic.lower() in topics:
-          conn = get_db_connection()
-          conn.execute("INSERT INTO wordles (creator, word, topic) VALUES (?, ?, ?)", (Msg.author.id, word, topic))
-          conn.commit()
-          conn.close()
-          
-          id = getWordle()["id"]
-          empty = "⬜"
+    if wordExists:
+      if len(word) == 5:
+        if word in getWord():
+          if topic.lower() in topics:
+            conn = get_db_connection()
+            conn.execute("INSERT INTO wordles (creator, word, topic) VALUES (?, ?, ?)", (Msg.author.id, word, topic))
+            conn.commit()
+            conn.close()
 
-          builder = discord.Embed(title = f"Wordle created! | Wordle #{str(id)}", name = "Wordle created", color=0x6aaa64, description = f"""> **Created by: <@{Msg.author.id}> | Topic: {topic}**
-
-{empty*5}
-{empty*5}
-{empty*5}
-{empty*5}
-{empty*5}
-{empty*5}""")
-          await Msg.channel.send(embed = builder)
+            id = getWordle(word)
+            empty = "⬜"
+  
+            builder = discord.Embed(title = f"Wordle created! | Wordle #{str(id)}", name = "Wordle created", color=0x6aaa64, description = f"""> **Created by: <@{Msg.author.id}> | Topic: {topic}**
+  
+  {empty*5}
+  {empty*5}
+  {empty*5}
+  {empty*5}
+  {empty*5}
+  {empty*5}""")
+            await Msg.channel.send(embed = builder)
+          else:
+            builder = discord.Embed(title = "Topic doesn't exist!", name = "No topic", color=0x6aaa64, description = f"`{topic}` does not exist!")
+            await Msg.channel.send(embed = builder)
         else:
-          builder = discord.Embed(title = "Topic doesn't exist!", name = "No topic", color=0x6aaa64, description = f"`{topic}` does not exist!")
+          builder = discord.Embed(title = "Word doesn't exist!", name = "No word", color=0x6aaa64, description = f"`{word}` is not a word that is in the dictionary!")
           await Msg.channel.send(embed = builder)
       else:
-        builder = discord.Embed(title = "Word doesn't exist!", name = "No word", color=0x6aaa64, description = f"`{word}` is not a word that is in the dictionary!")
+        builder = discord.Embed(title = "Word isn't 5 letters!", name = "Not five letters", color=0x6aaa64, description = f"`{word}` is not a 5 letter word!")
         await Msg.channel.send(embed = builder)
-    else:
-      builder = discord.Embed(title = "Word isn't 5 letters!", name = "Not five letters", color=0x6aaa64, description = f"`{word}` is not a 5 letter word!")
-      await Msg.channel.send(embed = builder)
 
   if msg.startswith(f"{PREFIX}game"):
     checkIfUserExists(Msg.author.id)

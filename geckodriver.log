@@ -1,0 +1,31 @@
+1656124077462	geckodriver	INFO	Listening on 127.0.0.1:39075
+1656124078174	mozrunner::runner	INFO	Running command: "/nix/store/qxx8bczjbq4cmsf80hnd3abbwaf9fmwk-firefox-esr-unwrapped-91.6.0esr/bin/firefox" "--marionette" "--remote-debugging-port" "49817" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofilekZxCjn"
+Crash Annotation GraphicsCriticalError: |[0][GFX1-]: glxtest: libEGL no display (t=2.81534) [GFX1-]: glxtest: libEGL no display
+1656124081113	Marionette	INFO	Marionette enabled
+
+(firefox:2187): Gtk-WARNING **: 02:28:01.387: Could not find the icon 'window-minimize-symbolic'. The 'hicolor' theme
+was not found either, perhaps you need to install it.
+You can get a copy from:
+	http://icon-theme.freedesktop.org/releases
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /tmp/rust_mozprofilekZxCjn/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:49817/devtools/browser/8534b52a-ad61-4f09-aa9c-e6edf6a53dab
+1656124088570	Marionette	INFO	Listening on port 43829
+1656124088678	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+1656124092853	Marionette	INFO	Stopped listening on port 43829
+JavaScript error: resource:///modules/Interactions.jsm, line 209: NS_ERROR_FAILURE: Component returned failure code: 0x80004005 (NS_ERROR_FAILURE) [nsIUserIdleService.removeIdleObserver]
+
+###!!! [Child][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
+
+
+###!!! [Child][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
+
+!!! error running onStopped callback: TypeError: callback is not a function
+
+###!!! [Parent][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
+
+1656124096267	RemoteAgent	ERROR	unable to stop listener: [Exception... "Component returned failure code: 0x8000ffff (NS_ERROR_UNEXPECTED) [nsIWindowMediator.getEnumerator]"  nsresult: "0x8000ffff (NS_ERROR_UNEXPECTED)"  location: "JS frame :: chrome://remote/content/cdp/observers/TargetObserver.jsm :: stop :: line 64"  data: no] Stack trace: stop()@TargetObserver.jsm:64
+unwatchForTabs()@TargetList.jsm:70
+unwatchForTargets()@TargetList.jsm:37
+destructor()@TargetList.jsm:109
+stop()@CDP.jsm:104
+close()@RemoteAgent.jsm:138

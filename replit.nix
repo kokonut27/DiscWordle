@@ -1,6 +1,8 @@
 { pkgs }: {
   deps = [
     pkgs.python38Full
+    pkgs.python38Packages.selenium
+    pkgs.firefox-esr-91-unwrapped
   ];
   env = {
     PYTHON_LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [
